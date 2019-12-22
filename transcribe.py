@@ -27,7 +27,7 @@ for i in range(2, 833):
         info = info.replace('</ins>','')
         info = info.replace('<ins>','')
         #print(info)
-        matches = re.findall(r"\|(\w*)\|(..)\|joined at: *(\d\d?)\|speed.*\|level: *(\d\d?)", info)
+        matches = re.findall(r"\|(\w*)\|(..)\|joined at: *(\d\d?)\|speed.*?days\|level: *(\d\d?)", info)
         matched = []
         for match in matches:
             name = match[0].encode('utf-8')
@@ -42,10 +42,10 @@ for i in range(2, 833):
                     print("User " + name + " joined on " + str(i))
                     newList = [name, goal, startLevel]
                     while len(newList) < i + 1:
-                        newList.append(' ')
-                    
+                        newList.append(0)
+
                     output.append(newList)
-                
+
                 if index == -1:
                     index = find(output, name)
                 #print(output)
@@ -54,6 +54,15 @@ for i in range(2, 833):
                 #output[index][1] = goal
                 #output[index][2] = startLevel
                 output[index[0]].append(currentLevel)
+
+# delete all players that have removed themselves from the list
+ind = 1
+while ind < len(output):
+    if len(output[ind]) < len(output[0]):
+        print("Removing " + output[ind][0] + " from data because they deleted themselves")
+        output.pop(ind)
+    else:
+        ind += 1
 
 # create table for level 10 and below
 dataLength = len(output[0])
@@ -88,3 +97,5 @@ with open("alldata.csv", "wb") as f:
     writer = csv.writer(f)
     writer.writerows(output)
 
+
+# try to generate the html file
