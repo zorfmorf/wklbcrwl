@@ -1,3 +1,4 @@
+from __future__ import print_function
 import re
 import json
 import datetime
@@ -16,7 +17,7 @@ def find(l, elem):
         return row, column
     return -1
 
-for i in range(2, 833):
+for i in range(5, 833):
     with open('raw/' + str(i) + '.json') as json_file:
         data = json.load(json_file)
         #print('Name: ' + data['username'])
@@ -26,15 +27,18 @@ for i in range(2, 833):
         info = data['body_changes']['side_by_side_markdown'].encode("utf-8")
         info = info.replace('</ins>','')
         info = info.replace('<ins>','')
-        #print(info)
-        matches = re.findall(r"\|(\w*)\|(..)\|joined at: *(\d\d?)\|speed.*?days\|level: *(\d\d?)", info)
+        info = info.replace('</del>','')
+        info = info.replace('<del>','')
+        #if i == 832:
+        #    print(info)
+        matches = re.findall(r"\?|([\w-]*)\|(..)\|joined at ?: *(\d\d?) ?\| ?speed.*?\| ?level: *(\d\d?)", info)
         matched = []
         for match in matches:
             name = match[0].encode('utf-8')
             goal = match[1].encode('utf-8')
-            startLevel = int(match[2].encode('utf-8'))
-            currentLevel = int(match[3].encode('utf-8'))
-            if name not in matched: # only match every name once
+            startLevel = match[2].encode('utf-8')
+            currentLevel = match[3].encode('utf-8')
+            if name not in matched and len(currentLevel) > 0: # only match every name once
                 matched.append(name)
                 #print(match[0] + match[1] + match[2] + match[3])
                 index = find(output, name)
@@ -43,9 +47,7 @@ for i in range(2, 833):
                     newList = [name, goal, startLevel]
                     while len(newList) < i + 1:
                         newList.append(0)
-
                     output.append(newList)
-
                 if index == -1:
                     index = find(output, name)
                 #print(output)
@@ -74,7 +76,7 @@ for i in range(1, len(output)-1):
     row = output[i]
     if len(row) == dataLength:
         # ommit users that havent updated for a while
-        oldLevel = row[len(row) - 100]
+        oldLevel = row[len(row) - 200]
         if oldLevel <= 2 or row[-1] > oldLevel:
             print("Taking user " + row[0] + " with level " + str(row[-1]))
             if row[-1] > 10:
@@ -98,4 +100,64 @@ with open("alldata.csv", "wb") as f:
     writer.writerows(output)
 
 
+htmlHeader = """
+<html>
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+"""
+
+htmlFooter = """
+    ]);
+
+      var options = {
+        title: 'Race to Your Goal December 2020',
+        curveType: 'function',
+        selectionMode: 'multiple',
+        dataOpacity: 0.0,
+        legend: { position: 'right' },
+        width: 1024,
+        height: 1024
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+      chart.draw(data, options);
+    }
+  </script>
+</head>
+<body>
+  <div id="curve_chart" style="width: 900px; height: 500px"></div>
+</body>
+</html>
+"""
+
 # try to generate the html file
+with open('plot.html', 'w') as f:
+    print(htmlHeader, file=f)
+    for j in range(0, len(output[0])-1):
+        if j == 0 or j >= 3:
+            tstr = "["
+            for i in range(0, 20):#len(output)-1):
+                if i > 0 and j >= 3:
+                    tstr += "," + str(output[i][j])
+                else:
+                    val = str(output[i][j])
+                    if len(val) > 10:
+                        val = val[:10]
+                    if j == 0 and i > 0:
+                        tstr += ","
+                    tstr += "'" + val + "'"
+            tstr += "]"
+            if j < len(output[0])-1:
+                tstr += ","
+            # replace 0s
+            tstr = tstr.replace(',0,', ',,')
+            tstr = tstr.replace(',0]', ',,]')
+            print(tstr, file=f)
+    print(htmlFooter, file=f)
