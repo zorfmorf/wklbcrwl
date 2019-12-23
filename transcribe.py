@@ -5,8 +5,7 @@ import datetime
 import csv
 import numpy as np
 import pandas as pd
-
-output = [['Name', 'Goal', 'Starting Level']]
+import os
 
 def find(l, elem):
     for row, i in enumerate(l):
@@ -17,7 +16,17 @@ def find(l, elem):
         return row, column
     return -1
 
-for i in range(5, 833):
+highestIndex = 0
+for r, d, f in os.walk("raw/"):
+    for file in f:
+        if '.json' in file:
+            num = file.replace(".json", "")
+            if int(num) > highestIndex:
+                highestIndex = int(num)
+
+print("Creating plot for " + str(highestIndex) + " files")
+output = [['Name', 'Goal', 'Starting Level']]
+for i in range(2, highestIndex):
     with open('raw/' + str(i) + '.json') as json_file:
         data = json.load(json_file)
         #print('Name: ' + data['username'])
@@ -29,6 +38,7 @@ for i in range(5, 833):
         info = info.replace('<ins>','')
         info = info.replace('</del>','')
         info = info.replace('<del>','')
+        info = info.replace('?', '0') # circumvent weird matching issues with questionmarks as speed
         #if i == 832:
         #    print(info)
         matches = re.findall(r"\?|([\w-]*)\|(..)\|joined at ?: *(\d\d?) ?\| ?speed.*?\| ?level: *(\d\d?)", info)
@@ -38,24 +48,27 @@ for i in range(5, 833):
             goal = match[1].encode('utf-8')
             startLevel = match[2].encode('utf-8')
             currentLevel = match[3].encode('utf-8')
-            if name not in matched and len(currentLevel) > 0: # only match every name once
-                matched.append(name)
-                #print(match[0] + match[1] + match[2] + match[3])
-                index = find(output, name)
-                if index == -1:
-                    print("User " + name + " joined on " + str(i))
-                    newList = [name, goal, startLevel]
-                    while len(newList) < i + 1:
-                        newList.append(0)
-                    output.append(newList)
-                if index == -1:
+            if len(currentLevel) == 0:
+                print("###########FUCK###############    " + name)
+                print(match)
+                print(info)
+            else:
+                if name not in matched:  # only match every name once
+                    matched.append(name)
                     index = find(output, name)
-                #print(output)
-                #print(index)
-                #output[index][0] = name
-                #output[index][1] = goal
-                #output[index][2] = startLevel
-                output[index[0]].append(currentLevel)
+                    if index == -1:
+                        print("User " + name + " joined on " + str(i))
+                        newList = [name, goal, startLevel]
+                        while len(newList) < len(output[0]) - 1:
+                            newList.append(0)
+                        output.append(newList)
+                        index = output[-1]
+                    output[index[0]].append(currentLevel)
+                else:
+                    index = find(output, name)
+                    if output[index[0]][3] < currentLevel:
+                        output[index[0]][3] = currentLevel
+
 
 # delete all players that have removed themselves from the list
 ind = 1
@@ -66,20 +79,29 @@ while ind < len(output):
     else:
         ind += 1
 
-# create table for level 10 and below
+# write raw data out
+with open("output.csv", "wb") as f:
+    writer = csv.writer(f)
+    writer.writerows(output)
+
+# create a table with all active users
 dataLength = len(output[0])
 active = []
 active.append(output[0])
 for i in range(1, len(output)-1):
     row = output[i]
     # ommit users that havent updated for a while
-    oldLevel = row[len(row) - 350]
+    oldLevel = row[len(row) - 200]
     if row[-1] > oldLevel:
         print("Taking user " + row[0] + " with level " + str(row[-1]))
         active.append(row)
     else:
         print("Ignoring data for user " + row[0] + " because they stopped updating")
 
+# write raw data out
+with open("filteredData.csv", "wb") as f:
+    writer = csv.writer(f)
+    writer.writerows(active)
 
 htmlHeader = """
 <html>
@@ -121,10 +143,11 @@ htmlFooter = """
 # try to generate the html file for the active dataset
 with open('plot.html', 'w') as f:
     print(htmlHeader, file=f)
+    print("Writing from " + str(0) + " to " + str(len(active[0])-1))
     for j in range(0, len(active[0])-1):
         if j == 0 or j >= 3:
             tstr = "["
-            for i in range(0, 20):#len(output)-1):
+            for i in range(0, len(output)-1):
                 if i > 0 and j >= 3:
                     tstr += "," + str(active[i][j])
                 else:
