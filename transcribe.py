@@ -66,8 +66,8 @@ for i in range(2, highestIndex):
                     output[index[0]].append(currentLevel)
                 else:
                     index = find(output, name)
-                    if output[index[0]][3] < currentLevel:
-                        output[index[0]][3] = currentLevel
+                    if output[index[0]][-1] < currentLevel:
+                        output[index[0]][-1] = currentLevel
 
 
 # delete all players that have removed themselves from the list
