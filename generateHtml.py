@@ -13,18 +13,33 @@ with open('output/output.csv', 'rb') as f:
     for row in reader:
         output.append(row)
 
-# TODO:
+# first simplify datefield to only contain days, we don't care about exact timestamps
+for i in range(3, len(output[0])):
+    output[0][i] = output[0][i][:10]
+
 # merge entries so we only have one per day. should speed up things in the browser
 # and make this thing long term sustainable
+i = 3
+while i < len(output[0]):
+    # find first index of next day
+    j = i + 1
+    while j < len(output[0]) and output[0][i] == output[0][j]:
+        j = j + 1
+    # now delete columns i to j - 2 if necessary
+    if i < j - 1:
+        for _ in range(j - 1 - i):
+            for row in output:
+                row.pop(i)
+    i += 1
 
 # create a table with all active users
 dataLength = len(output[0])
 active = []
 active.append(output[0])
-for i in range(1, len(output)-1):
+for i in range(1, len(output)):
     row = output[i]
     # ommit users that havent updated for a while
-    oldLevel = row[len(row) - 200] # update date calculation once data merging has been implemented
+    oldLevel = row[len(row) - 60] # update date calculation once data merging has been implemented
     if row[-1] > oldLevel:
         print("Taking user " + row[0] + " with level " + str(row[-1]))
         active.append(row)
@@ -74,7 +89,7 @@ htmlFooter = """
 """
 
 # try to generate the html file for the active dataset
-with open('output/plot.html', 'w') as f:
+with open('output/index.html', 'w') as f:
     print(htmlHeader, file=f)
     for j in range(0, len(active[0])-1):
         if j == 0 or j >= 3:
@@ -84,8 +99,6 @@ with open('output/plot.html', 'w') as f:
                     tstr += "," + str(active[i][j])
                 else:
                     val = str(active[i][j])
-                    if len(val) > 10:
-                        val = val[:10]
                     if j == 0 and i > 0:
                         tstr += ","
                     tstr += "'" + val + "'"

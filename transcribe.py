@@ -32,7 +32,7 @@ for r, d, f in os.walk("raw/"):
 
 print("Creating plot for " + str(highestIndex) + " files")
 output = [['Name', 'Goal', 'Starting Level']]
-for i in range(2, highestIndex):
+for i in range(2, highestIndex + 1):
     if i not in blacklist:
         with open('raw/' + str(i) + '.json') as json_file:
             
