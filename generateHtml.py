@@ -8,7 +8,7 @@ import pandas as pd
 import os
 
 output = []
-with open('output.csv', 'rb') as f:
+with open('output/output.csv', 'rb') as f:
     reader = csv.reader(f)
     for row in reader:
         output.append(row)
@@ -32,7 +32,7 @@ for i in range(1, len(output)-1):
         print("Ignoring data for user " + row[0] + " because they stopped updating")
 
 # write raw data out
-with open("filteredData.csv", "wb") as f:
+with open("output/filteredData.csv", "wb") as f:
     writer = csv.writer(f)
     writer.writerows(active)
 
@@ -74,7 +74,7 @@ htmlFooter = """
 """
 
 # try to generate the html file for the active dataset
-with open('plot.html', 'w') as f:
+with open('output/plot.html', 'w') as f:
     print(htmlHeader, file=f)
     for j in range(0, len(active[0])-1):
         if j == 0 or j >= 3:

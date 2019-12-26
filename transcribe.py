@@ -107,6 +107,7 @@ while ind < len(output):
         ind += 1
 
 # write raw data out
-with open("output.csv", "wb") as f:
+with open("output/output.csv", "wb") as f:
     writer = csv.writer(f)
     writer.writerows(output)
+
