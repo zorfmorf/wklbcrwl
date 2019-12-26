@@ -46,7 +46,7 @@ jobs:
         git config --global hub.protocol https
         git config --global user.email "spam@aborium.de"
         git config --global user.name "GitHub Action"
-        git clone https://github.com/zorfmorf/zorfmorf.github.io.git --depth 1
+        git clone https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/zorfmorf/zorfmorf.github.io.git --depth 1
         cd zorfmorf.github.io
         mv ../index/index.html index.html
         git add index.html
