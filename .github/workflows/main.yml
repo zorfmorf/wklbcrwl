@@ -43,6 +43,8 @@ jobs:
         path: index.html
     - name: Commit to remote repo
       run: |
+        ls -alh
+        ls -alh index.html
         git clone -n https://github.com/zorfmorf/zorfmorf.github.io.git --depth 1
         cd zorfmorf.github.io
         git checkout HEAD index.html
