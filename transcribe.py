@@ -77,7 +77,7 @@ for i in range(2, highestIndex):
                     else:
                         matched.append(name)
                         
-                        # new match for this i so first check if its new
+                        # new match for this i, so first check if its new
                         index = find(output, name)
                         if index == -1:
                             # new user, so we create data for this guy
@@ -85,7 +85,7 @@ for i in range(2, highestIndex):
                             output.append([name, goal, startLevel])
                             index = len(output) - 1 # index of new entry is last item in the list
                         
-                        # now append a bunch of zeros if the data list is too small
+                        # now append a bunch of zeros if the data list is too small.
                         # necessary for users that joined later (so nearly all of them)
                         # also catches cases where users left and rejoined the 
                         # race (so a bunch of values are missing for them)
@@ -100,7 +100,8 @@ for i in range(2, highestIndex):
 # delete all players that have removed themselves from the list
 ind = 1
 while ind < len(output):
-    if len(output[ind]) < len(output[0]):
+    # missing updates or no valid level? -> out of the race
+    if len(output[ind]) < len(output[0]) or output[ind][-1] < 1:
         print("Removing " + output[ind][0] + " from data because they deleted themselves")
         output.pop(ind)
     else:
