@@ -14,11 +14,11 @@ jobs:
     - uses: actions/checkout@v1
     - name: Create folders
       run: mkdir -p raw output html
-    - name: Download wanikani data
-      uses: actions/download-artifact@v1
-      with:
-        name: raw-wk-data
-        path: raw
+    #- name: Download wanikani data
+    #  uses: actions/download-artifact@v1
+    #  with:
+    #    name: raw-wk-data
+    #    path: raw
     - name: Get data from wanikani
       run: ./get.sh
     - name: Upload wanikani data
