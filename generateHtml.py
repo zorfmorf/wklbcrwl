@@ -13,6 +13,10 @@ with open('output.csv', 'rb') as f:
     for row in reader:
         output.append(row)
 
+# TODO:
+# merge entries so we only have one per day. should speed up things in the browser
+# and make this thing long term sustainable
+
 # create a table with all active users
 dataLength = len(output[0])
 active = []
@@ -20,7 +24,7 @@ active.append(output[0])
 for i in range(1, len(output)-1):
     row = output[i]
     # ommit users that havent updated for a while
-    oldLevel = row[len(row) - 200]
+    oldLevel = row[len(row) - 200] # update date calculation once data merging has been implemented
     if row[-1] > oldLevel:
         print("Taking user " + row[0] + " with level " + str(row[-1]))
         active.append(row)

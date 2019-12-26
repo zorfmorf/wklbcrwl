@@ -17,6 +17,10 @@ def find(l, elem):
     return -1
 
 highestIndex = 0
+
+# blacklist for changes that fucked the whole leaderboard
+blacklist = [ 836, 837, 838, 839, 840 ]
+
 for r, d, f in os.walk("raw/"):
     for file in f:
         if '.json' in file:
@@ -27,48 +31,57 @@ for r, d, f in os.walk("raw/"):
 print("Creating plot for " + str(highestIndex) + " files")
 output = [['Name', 'Goal', 'Starting Level']]
 for i in range(2, highestIndex):
-    with open('raw/' + str(i) + '.json') as json_file:
-        data = json.load(json_file)
-        #print('Name: ' + data['username'])
-        output[0].append(data['created_at'])
-        dateobj = datetime.datetime.strptime(data['created_at'][:13], '%Y-%m-%dT%H')
-        #print(dateobj)
-        info = data['body_changes']['side_by_side_markdown'].encode("utf-8")
-        info = info.replace('</ins>','')
-        info = info.replace('<ins>','')
-        info = info.replace('</del>','')
-        info = info.replace('<del>','')
-        info = info.replace('?', '0') # circumvent weird matching issues with questionmarks as speed
-        #if i == 832:
-        #    print(info)
-        matches = re.findall(r"\?|([\w-]*)\|(..)\|joined at ?: *(\d\d?) ?\| ?speed.*?\| ?level: *(\d\d?)", info)
-        matched = []
-        for match in matches:
-            name = match[0].encode('utf-8')
-            goal = match[1].encode('utf-8')
-            startLevel = match[2].encode('utf-8')
-            currentLevel = match[3].encode('utf-8')
-            if len(currentLevel) == 0:
-                print("###########FUCK###############    " + name)
-                print(match)
-                print(info)
-            else:
-                if name not in matched:  # only match every name once
-                    matched.append(name)
-                    index = find(output, name)
-                    if index == -1:
-                        print("User " + name + " joined on " + str(i))
-                        newList = [name, goal, startLevel]
-                        while len(newList) < len(output[0]) - 1:
-                            newList.append(0)
-                        output.append(newList)
-                        index = [ len(output)-1 ]
-                    output[index[0]].append(currentLevel)
+    if i not in blacklist:
+        with open('raw/' + str(i) + '.json') as json_file:
+            data = json.load(json_file)
+            #print('Name: ' + data['username'])
+            output[0].append(data['created_at'])
+            dateobj = datetime.datetime.strptime(data['created_at'][:13], '%Y-%m-%dT%H')
+            #print(dateobj)
+            info = data['body_changes']['side_by_side_markdown'].encode("utf-8")
+            info = info.replace('</ins>','')
+            info = info.replace('<ins>','')
+            info = info.replace('</del>','')
+            info = info.replace('<del>','')
+            info = info.replace('?', '0') # circumvent weird matching issues with questionmarks as speed
+            #if i == 832:
+            #    print(info)
+            matches = re.findall(r"\?|([\w-]*)\|(..)\|joined at ?: *(\d\d?) ?\| ?speed.*?\| ?level: *(\d\d?)", info)
+            matched = []
+            for match in matches:
+                name = match[0].encode('utf-8')
+                goal = match[1].encode('utf-8')
+                startLevel = match[2].encode('utf-8')
+                currentLevel = match[3].encode('utf-8')
+                if len(currentLevel) == 0:
+                    print("###########FUCK###############    " + name)
+                    print(match)
+                    print(info)
                 else:
-                    index = find(output, name)
-                    if output[index[0]][-1] < currentLevel:
-                        output[index[0]][-1] = currentLevel
-
+                    if name not in matched:  # only match every name once
+                        matched.append(name)
+                        index = find(output, name)
+                        if index == -1:
+                            print("User " + name + " joined on " + str(i))
+                            newList = [name, goal, startLevel]
+                            while len(newList) < len(output[0]) - 1:
+                                newList.append(0)
+                            output.append(newList)
+                            index = [ len(output)-1 ]
+                        output[index[0]].append(currentLevel)
+                    else:
+                        index = find(output, name)
+                        if output[index[0]][-1] < currentLevel:
+                            output[index[0]][-1] = currentLevel
+            # todo:
+            # add a zero to all users that have not been updated this matching cycle
+            # normally these are deleted users, but apparently, some deleted users
+            # come back and some might be accidentally removed from the leaderboard.
+            # So our data length test doesnt work anymore. We add zeros for these users
+            # instead And only at the end, if a user is still on level zero, we 
+            # actually remove them
+    else:
+        print("Omitting " + str(i) + " because it's blacklisted")
 
 # delete all players that have removed themselves from the list
 ind = 1
