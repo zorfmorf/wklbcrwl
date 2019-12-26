@@ -43,12 +43,12 @@ jobs:
         path: index
     - name: Commit to remote repo
       run: |
-        git clone -n https://github.com/zorfmorf/zorfmorf.github.io.git --depth 1
-        cd zorfmorf.github.io
-        git checkout HEAD index.html
-        mv ../index/index.html index.html
+        git config --global hub.protocol https
         git config --local user.email "spam@aborium.de"
         git config --local user.name "GitHub Action"
+        git clone https://github.com/zorfmorf/zorfmorf.github.io.git --depth 1
+        cd zorfmorf.github.io
+        mv ../index/index.html index.html
         git add index.html
         git commit -m "Update plot to latest version"
         git push
