@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Create folders
-      run: mkdir -p raw output html
+      run: mkdir -p raw output
     - name: Cache wanikani data
       id: cache
       uses: actions/cache@v1
@@ -26,11 +26,8 @@ jobs:
       run: python transcribe.py
     - name: Generate html
       run: python generateHtml.py
-    - name: Publish result
-      run: |
-        git config user.email "spam@aborium.de"
-        git config user.name "Auto Bilder"
-        cp output/index.html html/index.html
-        git add html/index.html
-        git commit -m "Update index.html"
-        git push origin HEAD:master
+    - name: Create html artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: plot
+        path: output/index.html
