@@ -33,4 +33,4 @@ jobs:
         cp output/index.html html/index.html
         git add html/index.html
         git commit -m "Update index.html"
-        git push
+        git push origin HEAD:master
