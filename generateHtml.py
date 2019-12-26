@@ -37,7 +37,7 @@ active.append(output[0])
 for i in range(1, len(output)):
     row = output[i]
     # ommit users that havent updated for a while
-    oldLevel = row[len(row) - 30] # update date calculation once data merging has been implemented
+    oldLevel = row[len(row) - 60] # active in the last 60 days
     if row[-1] > oldLevel:
         print("Taking user " + row[0] + " with level " + str(row[-1]))
         active.append(row)
@@ -81,6 +81,7 @@ htmlFooter = """
   </script>
 </head>
 <body>
+  <p>Updated on <script>document.write(new Date().toISOString().slice(0, 10))</script></p>
   <div id="curve_chart" style="width: 900px; height: 500px"></div>
 </body>
 </html>
