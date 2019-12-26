@@ -40,15 +40,13 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: plot
-        path: index.html
+        path: index
     - name: Commit to remote repo
       run: |
-        ls -alh
-        ls -alh index.html
         git clone -n https://github.com/zorfmorf/zorfmorf.github.io.git --depth 1
         cd zorfmorf.github.io
         git checkout HEAD index.html
-        mv ../index.html index.html
+        mv ../index/index.html index.html
         git config --local user.email "spam@aborium.de"
         git config --local user.name "GitHub Action"
         git add index.html
