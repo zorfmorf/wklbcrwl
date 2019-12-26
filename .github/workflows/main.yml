@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+  schedule:
+    - cron: '10 1 * * *'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Create folders
+      run: mkdir -p raw output html
+    - name: Get data from wanikani
+      run: ./get.sh
+    - name: Transcribe data
+      run: python transcribe.py
+    - name: Generate html
+      run: python generateHtml.py
+    - name: Publish result
+      run: |
+        cp output/index.html html/index.html
+        add html/index.html
+        git commit -m "Update index.html"
+        git push
