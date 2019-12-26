@@ -3,8 +3,6 @@ import re
 import json
 import datetime
 import csv
-import numpy as np
-import pandas as pd
 import os
 
 output = []
@@ -39,7 +37,7 @@ active.append(output[0])
 for i in range(1, len(output)):
     row = output[i]
     # ommit users that havent updated for a while
-    oldLevel = row[len(row) - 60] # update date calculation once data merging has been implemented
+    oldLevel = row[len(row) - 30] # update date calculation once data merging has been implemented
     if row[-1] > oldLevel:
         print("Taking user " + row[0] + " with level " + str(row[-1]))
         active.append(row)

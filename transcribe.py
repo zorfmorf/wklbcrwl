@@ -3,8 +3,6 @@ import re
 import json
 import datetime
 import csv
-import numpy as np
-import pandas as pd
 import os
 
 # custom search function that returns the row for an item
