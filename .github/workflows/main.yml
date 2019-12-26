@@ -50,5 +50,5 @@ jobs:
         cd zorfmorf.github.io
         mv ../index/index.html index.html
         git add index.html
-        git commit -m "Update plot to latest version"
+        git commit -m "Update plot to latest generated version"
         git push
