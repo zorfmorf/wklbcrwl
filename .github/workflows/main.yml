@@ -32,6 +32,6 @@ jobs:
     - name: Publish result
       run: |
         cp output/index.html html/index.html
-        add html/index.html
+        git add html/index.html
         git commit -m "Update index.html"
         git push
