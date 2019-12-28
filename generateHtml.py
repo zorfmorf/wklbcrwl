@@ -37,7 +37,7 @@ active.append(output[0])
 for i in range(1, len(output)):
     row = output[i]
     # ommit users that havent updated for a while
-    oldLevel = row[len(row) - 60] # active in the last 60 days
+    oldLevel = row[len(row) - 90] # active in the last 60 days
     if row[-1] > oldLevel:
         print("Taking user " + row[0] + " with level " + str(row[-1]))
         active.append(row)
@@ -66,12 +66,22 @@ htmlFooter = """
 
       var options = {
         title: 'Race to Your Goal December 2020',
-        curveType: 'function',
         selectionMode: 'multiple',
         dataOpacity: 0.0,
         legend: { position: 'right' },
         width: 1024,
-        height: 1024
+        height: 800,
+        explorer: { actions: ['dragToZoom', 'rightClickToReset'] },
+        vAxis: {
+            title: 'Level',
+            viewWindow: {
+                min: 1,
+                max: 60
+            }    
+        },
+        hAxis: {
+            title: 'Date'
+        }
       };
 
       var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
@@ -82,6 +92,7 @@ htmlFooter = """
 </head>
 <body>
   <p>Updated on <script>document.write(new Date().toISOString().slice(0, 10))</script></p>
+  <p> Drag a rectangle to zoom in. Rightclick to zoom out again.</p>
   <div id="curve_chart" style="width: 900px; height: 500px"></div>
 </body>
 </html>
