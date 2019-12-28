@@ -28,4 +28,4 @@ do
   wget_output=$(wget -q "$URL$i$SUFFIX" -P "$TARGET/")
 done
 
-echo "Downloaded all until excluding $i$SUFFIX"
+echo "Downloaded files until ${i-2}-3$SUFFIX"
