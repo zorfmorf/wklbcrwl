@@ -37,12 +37,13 @@ active.append(output[0])
 for i in range(1, len(output)):
     row = output[i]
     # ommit users that havent updated for a while
-    oldLevel = row[len(row) - 90] # active in the last 60 days
-    if row[-1] > oldLevel:
+    oldLevel = int(row[len(row) - 70]) # active in the last 60 days
+    currentLevel = int(row[-1])
+    if currentLevel == 60 or currentLevel > oldLevel:
         print("Taking user " + row[0] + " with level " + str(row[-1]))
         active.append(row)
     else:
-        print("Ignoring data for user " + row[0] + " because they stopped updating")
+        print("Ignoring data for user " + row[0] + " because they stopped updating [ " + str(oldLevel) + " " + row[-1] + " ]")
 
 # write raw data out
 with open("output/filteredData.csv", "wb") as f:
@@ -77,7 +78,7 @@ htmlFooter = """
             viewWindow: {
                 min: 1,
                 max: 60
-            }    
+            }
         },
         hAxis: {
             title: 'Date'
