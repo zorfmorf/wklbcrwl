@@ -102,10 +102,10 @@ htmlFooter = """
 # try to generate the html file for the active dataset
 with open('output/index.html', 'w') as f:
     print(htmlHeader, file=f)
-    for j in range(0, len(active[0])-1):
-        if j == 0 or j >= 3:
+    for j in range(0, len(active[0])):
+        if j == 0 or j >= 3: # ignore column goal and starting level
             tstr = "["
-            for i in range(0, len(active)-1):
+            for i in range(0, len(active)):
                 if i > 0 and j >= 3:
                     tstr += "," + str(active[i][j])
                 else:
