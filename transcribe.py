@@ -44,9 +44,8 @@ for i in range(2, highestIndex + 1):
             info = info.replace('</del>','')
             info = info.replace('<del>','')
             info = info.replace('?', '0') # circumvent weird matching issues with questionmarks as speed
-            
             # match all user level ups based on this fancy matching regex
-            matches = re.findall(r"\?|([\w-]*)\|(..)\|joined at ?: *(\d\d?) ?\| ?speed.*?\| ?level: *(\d\d?)", info)
+            matches = re.findall(r"\|?([\w -]*)\| ?(..?) ?\|.*?joined.*?speed.*?level: *?(\d\d?)", info)
             matched = []
             
             # go through all matches and write these to data
@@ -55,8 +54,7 @@ for i in range(2, highestIndex + 1):
                 # extract match data
                 name = match[0].encode('utf-8')
                 goal = match[1].encode('utf-8')
-                startLevel = match[2].encode('utf-8')
-                currentLevel = match[3].encode('utf-8')
+                currentLevel = match[2].encode('utf-8')
                 
                 # if the level is not set correctly, something went wrong
                 if len(currentLevel) == 0:
@@ -80,7 +78,7 @@ for i in range(2, highestIndex + 1):
                         if index == -1:
                             # new user, so we create data for this guy
                             print("User " + name + " joined on " + str(i))
-                            output.append([name, goal, startLevel])
+                            output.append([name, goal, currentLevel])
                             index = len(output) - 1 # index of new entry is last item in the list
                         
                         # now append a bunch of zeros if the data list is too small.
@@ -99,8 +97,8 @@ for i in range(2, highestIndex + 1):
 ind = 1
 while ind < len(output):
     # missing updates or no valid level? -> out of the race
-    if len(output[ind]) < len(output[0]) or output[ind][-1] < 1:
-        print("Removing " + output[ind][0] + " from data because they deleted themselves")
+    if len(output[ind]) < len(output[0]) or int(output[ind][-1]) < 1:
+        print("Removing " + output[ind][0] + " because they stopped updating")
         output.pop(ind)
     else:
         ind += 1
